@@ -27,7 +27,7 @@ const EngineEval = function(scriptString,data){
     try{
         eval(scriptString);
     }catch(err){
-        console.log(err);
+        _______str_________+="[-- Warning: "+err.message+"--]";
     }
 
     this.getResponse=function(){
