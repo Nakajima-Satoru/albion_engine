@@ -1,6 +1,12 @@
 const fs = require("fs");
+const EngineEval = require("./eval.js");
+const base64 = require("./base64.js");
 
 var albionEngine=function(html){
+
+    var tagStart="<%";
+
+    var tagEnd="%>";
 
     this.setData=function(data){
 
@@ -9,7 +15,7 @@ var albionEngine=function(html){
 
     this.convert=function(){
 
-        var buff1=html.split("<?node");
+        var buff1=html.split(tagStart);
 
         var sepalateBuffer=[];
 
@@ -21,7 +27,7 @@ var albionEngine=function(html){
         buff1.shift();
 
         for(var n=0;n<buff1.length;n++){
-            var buff1a=buff1[n].split("?>");
+            var buff1a=buff1[n].split(tagEnd);
             sepalateBuffer.push({
                 type:"script",
                 content:buff1a[0],
@@ -37,8 +43,9 @@ var albionEngine=function(html){
             var value=sepalateBuffer[n];
 
             if(value.type=="text"){
-                var content=(Buffer.from(encodeURIComponent(value.content)).toString('base64'));
-                scriptString+="echo64(\""+content+"\");\n";
+                // var content=(Buffer.from(encodeURIComponent(value.content)).toString('base64'));
+                var content = base64.encode(value.content);
+                scriptString+="echo(base64.decode(\""+content+"\"));\n";
             }
             else if(value.type=="script"){
                 scriptString+=value.content+"\n";
@@ -46,58 +53,12 @@ var albionEngine=function(html){
 
         }
 
-        var str=this._eval(scriptString);
+        var _eval = new EngineEval(scriptString);
+
+        var str=_eval.getResponse();
 
         return str;
     };
-
-
-    this._eval=function(_string){
-
-        var _str="";
-
-        var echo=function(string){
-            _str+=string;
-        };
-        var echo64=function(string){
-            string=decodeURIComponent(Buffer.from(string, 'base64').toString());
-            if(string){
-                _str+=string;
-            }
-        };
-        var include=function(path){
-            if(!fs.existsSync(path)){
-                throw new Error("Include File \""+path+"\" file not found.");
-            }
-
-            var includeString=fs.readFileSync(path).toString();
-
-            var _b=new albionEngine(includeString);
-
-            var string=_b.convert();
-
-            _str+=string;
-        }
-
-        try{
-            eval(_string);
-        }catch(err){
-            console.log(err);
-        }
-
-        return _str;
-    };
-
-    this.base64={
-        encode:function(str){
-            return (Buffer.from(encodeURIComponent(str)).toString('base64'));
-        },
-    
-        decode:function(str){
-            return decodeURIComponent(Buffer.from(str, 'base64').toString());
-        },
-    };
-    
 
 };
 
