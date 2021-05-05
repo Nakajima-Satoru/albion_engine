@@ -15,9 +15,9 @@ const EngineEval = function(scriptString,data){
 
         var includeString=fs.readFileSync(path).toString();
 
-        const albionEngine = require("./index.js");
+        const daggerEngine = require("./index.js");
 
-        var _b=new albionEngine(includeString);
+        var _b=new daggerEngine(includeString);
 
         var string=_b.convert();
 

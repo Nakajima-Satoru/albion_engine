@@ -2,7 +2,7 @@ const fs = require("fs");
 const EngineEval = require("./eval.js");
 const base64 = require("./base64.js");
 
-var albionEngine=function(html){
+var daggerEngine=function(html){
 
     var tagStart="<%";
 
@@ -62,4 +62,4 @@ var albionEngine=function(html){
 
 };
 
-module.exports=albionEngine;
+module.exports=daggerEngine;
